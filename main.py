@@ -27,7 +27,10 @@ def check_add(domain):
 #Check the WebService is work
 def check_available(domain):
     url = "http://" + domain
-    r = requests.get(url)
+    try:
+        r = requests.get(url)
+    except TooManyRedirects:
+        pass
     urlp = urlparse.urlparse(r.url)
     if urlp.netloc == domain:
         return {'status': True, "domain": urlp.netloc}

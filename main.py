@@ -110,7 +110,7 @@ def mergeRes(domain):
 
     #Write result into file
     path = os.path.join(os.getcwd(), 'res')
-    path = os.path.join(os.getcwd(), domain)
+    path = os.path.join(path, domain)
     os.mkdir(path)
     path = os.path.join(path, domain + '.txt')
     f = open(path, 'w')
@@ -122,9 +122,9 @@ def mergeRes(domain):
 
         res = check_available(i)
         if res['status']:
-            temp = temp + "redirect to %s\n" % res['domain']
-        else:
             temp = temp + "normal\n"
+        else:
+            temp = temp + "redirect to %s\n" % res['domain']
         f.write(temp)
     f.close()
 

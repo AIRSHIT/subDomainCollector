@@ -111,7 +111,11 @@ def mergeRes(domain):
     #Write result into file
     path = os.path.join(os.getcwd(), 'res')
     path = os.path.join(path, domain)
-    os.mkdir(path)
+    try:
+        os.mkdir(path)
+    except OSError:
+        logging.info("Directory already exist.")
+        
     path = os.path.join(path, domain + '.txt')
     f = open(path, 'w')
     for i in data:

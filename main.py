@@ -29,7 +29,7 @@ def check_available(domain):
     url = "http://" + domain
     try:
         r = requests.get(url)
-    except TooManyRedirects:
+    except requests.exceptions.TooManyRedirects:
         pass
     urlp = urlparse.urlparse(r.url)
     if urlp.netloc == domain:

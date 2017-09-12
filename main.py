@@ -29,9 +29,9 @@ def check_available(domain):
     r = requests.get(url)
     urlp = urlparse.urlparse(r.url)
     if urlp.netloc == domain:
-        return True
+        return {'status': True, "domain": urlp.netloc}
     else:
-        return False
+        return {'status': False, "domain": urlp.netloc}
 
 #Get the domain list
 def get_Domain_list():
@@ -116,11 +116,16 @@ def mergeRes(domain):
     f = open(path, 'w')
     for i in data:
         if check_add(i):
-            temp = "%24s + '\tUp + '\n'" % (i)
-            f.write(temp)
+            temp = "%24s\tUp\t" % (i)
         else:
-            temp = "%24s + '\tDown + '\n'" % (i)
-            f.write(temp)
+            temp = "%24s\tDown\t" % (i)
+
+        res = check_available(i)
+        if res['status']:
+            temp = temp + "redirect to %s\n" % res['domain']
+        else:
+            temp = temp + "normal\n"
+        f.write(temp)
     f.close()
 
 if __name__ == '__main__':

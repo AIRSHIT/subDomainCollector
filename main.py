@@ -32,7 +32,7 @@ def check_available(domain):
         res_url = r.url
     except requests.exceptions.TooManyRedirects:
         res_url = url
-    urlp = urlparse.urlparse(res_url )
+    urlp = urlparse.urlparse(res_url)
     if urlp.netloc == domain:
         return {'status': True, "domain": urlp.netloc}
     else:
@@ -151,13 +151,15 @@ if __name__ == '__main__':
         logging.info("Ctrl C - Stopping Client")
         sys.exit(1)
     except Exception, e:
+        '''
         msg = ''
         msg += 'str(Exception):\t'+ str(Exception) + '\n'
         msg += 'str(e):\t\t' + str(e) + '\n'
         msg += 'repr(e):\t' + repr(e) + '\n'
         msg += 'e.message:\t' + e.message + '\n'
+        '''
         f = open('errmsg.txt', 'w')
-        f.write(msg)
+        #f.write(msg)
         traceback.print_exc(file=f)
         f.flush()
         f.close()

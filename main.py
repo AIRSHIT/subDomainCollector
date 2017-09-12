@@ -9,6 +9,7 @@ import shlex
 import whois_query
 import requests
 import urlparse
+import traceback
 
 #Check the domain is reachable 
 def check_add(domain):
@@ -109,6 +110,7 @@ def mergeRes(domain):
     data = list(set(data))
 
     #Write result into file
+    logging.info("Write result into file.")
     path = os.path.join(os.getcwd(), 'res')
     path = os.path.join(path, domain)
     try:
@@ -152,4 +154,6 @@ if __name__ == '__main__':
         msg += 'e.message:\t' + e.message + '\n'
         f = open('errmsg.txt', 'w')
         f.write(msg)
+        traceback.print_exc(file=f)
+        f.flush()
         f.close()

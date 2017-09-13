@@ -11,7 +11,7 @@ import requests
 import urlparse
 import traceback
 
-#Check the domain is reachable 
+#Check the domain is resolveable
 def check_add(domain):
     cmd = "ping -c 1 " + domain
     args = shlex.split(cmd)
@@ -27,16 +27,19 @@ def check_add(domain):
 #Check the WebService is work
 def check_available(domain):
     url = "http://" + domain
+    res = {}
     try:
         r = requests.get(url)
-        res_url = r.url
+        urlp = urlparse.urlparse(r.url)
+        if urlp.netloc == domain:
+            res = {'status': 'Normal', "domain": urlp.netloc}
+        else:
+            res = {'status': 'Being redirected', "domain": urlp.netloc}
     except requests.exceptions.TooManyRedirects:
-        res_url = url
-    urlp = urlparse.urlparse(res_url)
-    if urlp.netloc == domain:
-        return {'status': True, "domain": urlp.netloc}
-    else:
-        return {'status': False, "domain": urlp.netloc}
+        res = {'status': 'Too many redirect', "domain": url}
+    except:
+        res = {'status': 'Unavailable', "domain": url}
+    return res
 
 #Get the domain list
 def get_Domain_list():
@@ -126,15 +129,12 @@ def mergeRes(domain):
     f = open(path, 'w')
     for i in data:
         if check_add(i):
-            temp = "%24s\tUp\t" % (i)
+            temp = "%30s\tUp\t" % (i)
         else:
-            temp = "%24s\tDown\t" % (i)
+            temp = "%30s\tDown\t" % (i)
 
         res = check_available(i)
-        if res['status']:
-            temp = temp + "normal\n"
-        else:
-            temp = temp + "redirect to %s\n" % res['domain']
+        temp = temp + "%15s\t%s\n" % (res['status'], res['domain'])
         f.write(temp)
     f.close()
 

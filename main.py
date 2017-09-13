@@ -29,7 +29,7 @@ def check_available(domain):
     url = "http://" + domain
     res = {}
     try:
-        r = requests.get(url)
+        r = requests.get(url, timeout=6)
         urlp = urlparse.urlparse(r.url)
         if urlp.netloc == domain:
             res = {'status': 'Normal', "domain": urlp.netloc}
@@ -37,6 +37,8 @@ def check_available(domain):
             res = {'status': 'Being redirected', "domain": urlp.netloc}
     except requests.exceptions.TooManyRedirects:
         res = {'status': 'Too many redirect', "domain": domain}
+    except requests.exceptions.ConnectTimeout:
+        res = {'status': 'Request timeout', "domain": domain}
     except:
         res = {'status': 'Unavailable', "domain": domain}
     return res

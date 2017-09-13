@@ -36,9 +36,9 @@ def check_available(domain):
         else:
             res = {'status': 'Being redirected', "domain": urlp.netloc}
     except requests.exceptions.TooManyRedirects:
-        res = {'status': 'Too many redirect', "domain": url}
+        res = {'status': 'Too many redirect', "domain": domain}
     except:
-        res = {'status': 'Unavailable', "domain": url}
+        res = {'status': 'Unavailable', "domain": domain}
     return res
 
 #Get the domain list

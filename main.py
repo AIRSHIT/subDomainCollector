@@ -134,7 +134,7 @@ def mergeRes(domain):
             temp = "%30s\tDown\t" % (i)
 
         res = check_available(i)
-        temp = temp + "%15s\t%s\n" % (res['status'], res['domain'])
+        temp = temp + "%20s\t%s\n" % (res['status'], res['domain'])
         f.write(temp)
     f.close()
 

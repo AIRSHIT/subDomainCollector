@@ -68,7 +68,7 @@ def query(domain):
         res2 = {}
 
     path = os.path.join(os.getcwd(), 'res')
-    path = os.path.join(os.getcwd(), domain)
+    path = os.path.join(path, domain)
     path = os.path.join(path, domain + '_reverse_query.txt')
     f = open(path, 'w')
     f.write("Reverse_query_by_name" +'\n')

@@ -10,37 +10,40 @@ import whois_query
 import requests
 import urlparse
 import traceback
+import socket
 
 #Check the domain is resolveable
 def check_add(domain):
-    cmd = "ping -c 1 " + domain
-    args = shlex.split(cmd)
-
-    status = False
     try:
-        subprocess.check_call(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        status = True
-    except subprocess.CalledProcessError:
-        status = False
-    return status
+        ip = socket.gethostbyname(domain)
+    except:
+        return {'status': False}
+    return {'status': True, 'ip': ip}
 
 #Check the WebService is work
-def check_available(domain):
+def check_available(domain, hash_m):
     url = "http://" + domain
     res = {}
     try:
         r = requests.get(url, timeout=6)
         urlp = urlparse.urlparse(r.url)
-        if urlp.netloc == domain:
-            res = {'status': 'Normal', "domain": urlp.netloc}
+        res = {'status': r.status_code, 'domain': urlp.netloc}
+        hash_s = hash(r.content)
+        if hash_m == hash_s:
+            res['page_sta'] = 'Maybe Same page.'
         else:
-            res = {'status': 'Being redirected', "domain": urlp.netloc}
+            res['page_sta'] = 'All good.'
     except requests.exceptions.TooManyRedirects:
-        res = {'status': 'Too many redirect', "domain": domain}
+        res = {'status': 'Too many redirect'}
     except requests.exceptions.ConnectTimeout:
-        res = {'status': 'Request timeout', "domain": domain}
+        res = {'status': 'Request timeout'}
     except:
-        res = {'status': 'Unavailable', "domain": domain}
+        res = {'status': 'Unavailable'}
+    finally:
+        if not r:
+            res['domain'] = domain
+            res['page_sta'] = 'PageError'
+
     return res
 
 #Get the domain list
@@ -52,7 +55,7 @@ def get_Domain_list():
     return lines
 domain_list = get_Domain_list()
 
-#Brute wat 1
+#Brute way 1
 def start_wydomainAPI(domain):
     old_pwd = os.getcwd()
     pwd = os.path.join(os.getcwd(), 'wydomain')
@@ -60,7 +63,7 @@ def start_wydomainAPI(domain):
     os.system('python wydomain.py -d ' + domain)
     os.chdir(old_pwd)
 
-#Brute wat 2
+#Brute way 2
 def start_wydomainbrute(domain):
     old_pwd = os.getcwd()
     pwd = os.path.join(os.getcwd(), 'wydomain')
@@ -68,7 +71,7 @@ def start_wydomainbrute(domain):
     os.system('python dnsburte.py -d ' + domain)
     os.chdir(old_pwd)
 
-#Brute wat 3
+#Brute way 3
 def start_bruteljj(domain):
     old_pwd = os.getcwd()
     pwd = os.path.join(os.getcwd(), 'subDomainsBrute')
@@ -128,21 +131,25 @@ def mergeRes(domain):
         logging.info("Directory already exist.")
         
     path = os.path.join(path, domain + '.txt')
+    r = requests.get("http://"+domain)
+    hash_m = hash(r.content)
     f = open(path, 'w')
     for i in data:
-        if check_add(i):
-            temp = "%30s\tUp\t" % (i)
+        res = check_add(i)
+        if res['status']:
+            temp = "%40s\t%s\t" % (i, res['ip'])
         else:
-            temp = "%30s\tDown\t" % (i)
-
-        res = check_available(i)
-        temp = temp + "%20s\t%s\n" % (res['status'], res['domain'])
+            temp = "%40s\tCan't resolved.\t" % (i)
+        
+        res = check_available(i, hash_m)
+        temp = temp + "%20s\t%20s\t%20s\n" % (res['status'], res['domain'], res['page_sta'])
         f.write(temp)
     f.close()
 
 if __name__ == '__main__':
     try:
         for i in domain_list:
+            print 'Bruting %s' % (i)
             i = i.strip()
             start_wydomainbrute(i)
             start_wydomainAPI(i)
@@ -153,13 +160,6 @@ if __name__ == '__main__':
         logging.info("Ctrl C - Stopping Client")
         sys.exit(1)
     except Exception, e:
-        '''
-        msg = ''
-        msg += 'str(Exception):\t'+ str(Exception) + '\n'
-        msg += 'str(e):\t\t' + str(e) + '\n'
-        msg += 'repr(e):\t' + repr(e) + '\n'
-        msg += 'e.message:\t' + e.message + '\n'
-        '''
         f = open('errmsg.txt', 'w')
         #f.write(msg)
         traceback.print_exc(file=f)

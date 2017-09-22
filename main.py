@@ -124,15 +124,19 @@ def mergeRes(domain):
     #Write result into file
     logging.info("Write result into file.")
     path = os.path.join(os.getcwd(), 'res')
+    try:
+        os.mkdir(path)
+    except OSError:
+        logging.info("Directory already exist.")
     path = os.path.join(path, domain)
     try:
         os.mkdir(path)
     except OSError:
         logging.info("Directory already exist.")
         
-    path = os.path.join(path, domain + '.txt')
     r = requests.get("http://"+domain)
     hash_m = hash(r.content)
+    path = os.path.join(path, domain + '.txt')
     f = open(path, 'w')
     for i in data:
         res = check_add(i)
@@ -149,11 +153,12 @@ def mergeRes(domain):
 if __name__ == '__main__':
     try:
         for i in domain_list:
-            print 'Bruting %s' % (i)
+            print 'Bruting %s...' % (i)
             i = i.strip()
             start_wydomainbrute(i)
             start_wydomainAPI(i)
             start_bruteljj(i)
+            print "Merging result..."
             mergeRes(i)
             whois_query.query(i)
     except KeyboardInterrupt:

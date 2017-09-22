@@ -39,11 +39,12 @@ def check_available(domain, hash_m):
         res = {'status': 'Request timeout'}
     except:
         res = {'status': 'Unavailable'}
-    finally:
-        if not r:
-            res['domain'] = domain
-            res['page_sta'] = 'PageError'
-
+    try:
+        r
+    except:
+        res['domain'] = domain
+        res['page_sta'] = 'PageError'
+        
     return res
 
 #Get the domain list

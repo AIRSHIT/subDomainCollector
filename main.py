@@ -39,17 +39,20 @@ def check_available(domain, hash_m):
         res = {'status': 'Request timeout'}
     except:
         res = {'status': 'Unavailable'}
+
     try:
         r
     except:
         res['domain'] = domain
         res['page_sta'] = 'PageError'
-        
+
     return res
 
 #Get the domain list
 def get_Domain_list():
     file_path = 'domain_list.txt'
+    if not os.path.isfile(file_path):
+        raise "Domain list file did't exist."
     f = open(file_path, 'r')
     lines = f.readlines()
     f.close()
@@ -134,9 +137,12 @@ def mergeRes(domain):
         os.mkdir(path)
     except OSError:
         logging.info("Directory already exist.")
-        
-    r = requests.get("http://"+domain)
-    hash_m = hash(r.content)
+
+    try:
+        r = requests.get("http://"+domain)
+        hash_m = hash(r.content)
+    except:
+        hash_m = 0
     path = os.path.join(path, domain + '.txt')
     f = open(path, 'w')
     for i in data:

@@ -1,16 +1,16 @@
+#coding:utf8
 import os
-import json
 import re
 import sys
-import traceback
-import logging
-import subprocess
+import json
 import shlex
-import whois_query
+import socket
+import logging
 import requests
 import urlparse
 import traceback
-import socket
+import subprocess
+import whois_query
 
 #Check the domain is resolveable
 def check_add(domain):
@@ -139,7 +139,7 @@ def mergeRes(domain):
         logging.info("Directory already exist.")
 
     try:
-        r = requests.get("http://"+domain)
+        r = requests.get("http://" + domain)
         hash_m = hash(r.content)
     except:
         hash_m = 0
@@ -148,20 +148,25 @@ def mergeRes(domain):
     for i in data:
         res = check_add(i)
         if res['status']:
-            temp = "%40s\t%s\t" % (i, res['ip'])
+            temp = "%35s\t%s\t" % (i, res['ip'])
         else:
-            temp = "%40s\tCan't resolved.\t" % (i)
+            temp = "%35s\tCan't resolved.\t" % (i)
         
         res = check_available(i, hash_m)
-        temp = temp + "%20s\t%20s\t%20s\n" % (res['status'], res['domain'], res['page_sta'])
+        temp = temp + "%20s\t%35s\t%20s\n" % (res['status'], res['domain'], res['page_sta'])
         f.write(temp)
     f.close()
 
 if __name__ == '__main__':
     try:
         for i in domain_list:
-            print 'Bruting %s...' % (i)
             i = i.strip()
+            if i == '':
+                continue
+            if i[0] == '#':
+                continue
+    
+            print 'Bruting %s...' % (i)
             start_wydomainbrute(i)
             start_wydomainAPI(i)
             start_bruteljj(i)
